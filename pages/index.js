@@ -3,8 +3,11 @@ import { PageSEO } from "@/components/SEO";
 import Head from "next/head";
 import Card from "./Card";
 
-const CARD_BACK =
+const CARD_DEFAULT =
   "http://k.kakaocdn.net/dn/conr6V/bl4CKgQKwVl/0uOXFVu78ptVG536RNVWZ1/kakaolink40_original.png";
+
+const CARD_BACK =
+  "http://k.kakaocdn.net/dn/bVbmvz/bl4CL7Gdacv/9ZFm0v2pVLX9uZiJecOqi1/kakaolink40_original.png";
 
 export const getServerSideProps = async (context) => {
   const { title, desc, image } = context.query;
@@ -57,7 +60,6 @@ const NewYearsTarrot = ({
   // OpenAI 활용하여 메시지를 만드는 함수
   const getAIMessage = async (body) => {
     const { topic, receiver, sender, relation } = body;
-    console.log("body", body);
     try {
       const response = await fetch("/api/new-year/text", {
         method: "POST",
@@ -237,21 +239,22 @@ const NewYearsTarrot = ({
                 onChange={handleChangeTopic}
               />
             </div>
-            <div className="mb-8">
-              <label
-                htmlFor="image"
-                className="mb-2 block font-medium text-gray-700 dark:text-gray-300"
-              >
-                이미지
-              </label>
-              {imageUrl ? (
+
+            {imageUrl ? (
+              <div className="mb-8">
+                <label
+                  htmlFor="image"
+                  className="mb-2 block font-medium text-gray-700 dark:text-gray-300"
+                >
+                  이미지
+                </label>
                 <div id="preview" className="mt-5">
                   <Card title={title} description={desc} imgSrc={imageUrl} />
                 </div>
-              ) : (
-                <div></div>
-              )}
-            </div>
+              </div>
+            ) : (
+              <div></div>
+            )}
           </div>
         )}
         <button
@@ -266,9 +269,10 @@ const NewYearsTarrot = ({
             });
 
             setLoadingMsg("이미지를 생성하는 중입니다...");
-            const generatedImage = await getAIImage({
-              topic,
-            });
+            const generatedImage =
+              (await getAIImage({
+                topic,
+              })) ?? CARD_DEFAULT;
 
             setImageUrl(generatedImage);
             console.log("generatedImage", generatedImage);
